@@ -113,29 +113,31 @@
 
   /* フッター */
   footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #ffffff;
-    padding: 12px 18px;
-    border-top: 1px solid #e5e5e5;
-    display: flex;
-    justify-content: space-between;
-    max-width: 500px;
-    margin: auto;
-    left: 0;
-    right: 0;
-  }
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #ffffff;
+  padding: 12px 12px; /* ← 18px → 12px に少し縮める */
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  gap: 10px; /* ← space-between をやめる */
+  max-width: 100%; /* ← 500px をやめる */
+  margin: 0; /* ← auto をやめる */
+  left: 0;
+  right: 0;
+}
 
-  footer button {
-    flex: 1;
-    margin: 0 6px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: #e5e5e5;
-    font-size: 14px;
-  }
+ footer button {
+  flex: 1;
+  min-width: 0; /* ← これが超重要 */
+  white-space: normal; /* ← 折り返しOK */
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #e5e5e5;
+  font-size: 14px;
+}
 
   /* カテゴリ管理モーダル */
   .modal-bg {
