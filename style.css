@@ -42,14 +42,16 @@
 
 footer {
   display: flex;
-  flex-wrap: wrap; /* ← これが超重要 */
+  flex-wrap: wrap;
   gap: 10px;
   padding: 10px;
+  min-width: 0; /* ← これが超重要 */
 }
 
 footer button {
-  flex: 1; /* 幅を自動調整してくれる */
-  min-width: 120px; /* 好きに調整してOK */
+  flex: 1;
+  min-width: 0; /* ← これがないと絶対縮まらない */
+  white-space: normal; /* ← これで改行OKになる */
 }
 
 footer button {
