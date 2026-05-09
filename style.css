@@ -1,0 +1,71 @@
+/* ヘッダー全体のレイアウト */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+/* タイトル部分 */
+.header .title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.konbu-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* カテゴリ管理ボタン */
+.category-button {
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* タイトル部分の幅を固定して、ボタンを右寄せ */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0; /* ← タイトルが広がりすぎないようにする */
+}
+
+/* ヘッダー全体のレイアウトを安定させる */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px; /* ← 左右に余白を追加 */
+  box-sizing: border-box;
+}
+
+.modal input,
+.modal select {
+  width: calc(100% - 24px); /* ← 内側余白分を引く */
+  box-sizing: border-box;   /* ← 幅計算を安定させる */
+}
+
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .category-button {
+    margin-top: 10px;
+    align-self: flex-end;
+  }
+}

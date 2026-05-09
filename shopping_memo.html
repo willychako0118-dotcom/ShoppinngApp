@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#ffffff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Memo</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #f7f7f7;
+    color: #333;
+  }
+
+  .container {
+    padding: 90px 18px 100px;
+    max-width: 500px;
+    margin: auto;
+  }
+
+  /* 入力欄 */
+  .input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .input-area input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    background: #fff;
+  }
+
+  .input-area button {
+    padding: 14px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #007aff;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* カテゴリタイトル */
+  .category-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+    color: #555;
+  }
+
+  /* アイテムカード */
+  .item {
+    background: #fff;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    animation: fadeSlideIn 0.25s ease-out;
+    cursor: grab;
+  }
+
+  .item:active {
+    cursor: grabbing;
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .item.checked {
+    background: #f0f0f0;
+    text-decoration: line-through;
+    color: #888;
+    transition: all 0.25s ease;
+    transform: scale(0.98);
+    opacity: 0.7;
+  }
+
+  .item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .item button.delete {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+  }
+
+  .item.removing {
+    animation: slideOut 0.25s forwards ease-in;
+  }
+
+  @keyframes slideOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(40px); }
+  }
+
+  /* フッター */
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #ffffff;
+    padding: 12px 18px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: auto;
+    left: 0;
+    right: 0;
+  }
+
+  footer button {
+    flex: 1;
+    margin: 0 6px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #e5e5e5;
+    font-size: 14px;
+  }
+
+  /* カテゴリ管理モーダル */
+  .modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 85%;
+    max-width: 380px;
+    animation: fadeSlideIn 0.25s ease-out;
+  }
+
+  .modal h3 {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .cat-card {
+    background: #fff;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin: 8px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cat-del {
+    background: #ff3b30;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .modal-buttons button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #007aff;
+    color: white;
+  }
+
+  .modal-buttons .cancel {
+    background: #aaa;
+  }
+
+  /* 商品追加モーダル */
+  .modal input, .modal select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="title">
+    <img src="konbu_transparent.png" class="konbu-icon" alt="Shopping Cat">
+    Shopping Memo
+  </div>
+
+  <button class="category-button" onclick="openCategoryManager()">
+    カテゴリ管理
+  </button>
+</header>
+
+
+<div class="container">
+
+  <div class="input-area">
+    <input id="itemInput" type="text" placeholder="買うものを入力">
+    <button onclick="openAddItemModal()">＋</button>
+  </div>
+
+  <div id="categories"></div>
+
+</div>
+
+<footer>
+  <button onclick="clearChecked()">チェック済み削除</button>
+  <button onclick="clearAll()">全削除</button>
+</footer>
+
+<!-- 商品追加モーダル -->
+<div class="modal-bg" id="addItemModalBg">
+  <div class="modal">
+    <h3>商品を追加</h3>
+    <input id="modalItemName" type="text" readonly>
+    <select id="modalCategory"></select>
+
+    <div class="modal-buttons">
+      <button class="cancel" onclick="closeAddItemModal()">キャンセル</button>
+      <button onclick="confirmAdd()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- カテゴリ管理モーダル -->
+<div class="modal-bg" id="categoryModalBg">
+  <div class="modal">
+    <h3>カテゴリ管理</h3>
+    <div id="categoryList"></div>
+
+    <div class="modal-buttons">
+      <button onclick="addCategory()">カテゴリ追加</button>
+      <button class="cancel" onclick="closeCategoryManager()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* 保存データ */
+  let data = JSON.parse(localStorage.getItem("shoppingData")) || {
+    categories: [
+      { name: "スーパー", icon: "🏬", items: [] },
+      { name: "ドラッグストア", icon: "🧴", items: [] },
+      { name: "その他", icon: "📦", items: [] }
+    ]
+  };
+
+  const categoriesDiv = document.getElementById("categories");
+
+  /* 保存 */
+  function save() {
+    localStorage.setItem("shoppingData", JSON.stringify(data));
+  }
+
+  /* 商品追加モーダル */
+  function openAddItemModal() {
+    const text = document.getElementById("itemInput").value.trim();
+    if (!text) return;
+
+    tempItemName = text;
+    modalItemName.value = text;
+
+    const aiIndex = detectCategory(text);
+
+    modalCategory.innerHTML = "";
+    data.categories.forEach((cat, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${cat.icon} ${cat.name}`;
+      if (i === aiIndex) opt.selected = true;
+      modalCategory.appendChild(opt);
+    });
+
+    addItemModalBg.style.display = "flex";
+  }
+
+  function closeAddItemModal() {
+    addItemModalBg.style.display = "none";
+  }
+
+  function confirmAdd() {
+    const catIndex = Number(modalCategory.value);
+    data.categories[catIndex].items.push({
+      text: tempItemName,
+      checked: false
+    });
+
+    document.getElementById("itemInput").value = "";
+    closeAddItemModal();
+    save();
+    render();
+  }
+
+  /* AIカテゴリ推定 */
+  function detectCategory(text) {
+    text = text.toLowerCase();
+
+    const rules = [
+      { words: ["野菜","やさい","肉","魚","米","パン","飲料","飲み物","牛乳","卵","調味料","果物","フルーツ","ジュース","水","お茶","コーヒー","紅茶"], index: 0 },
+      { words: ["シャンプー","洗剤","化粧","ティッシュ","日用品","石鹸","歯磨き","歯ブラシ","薬","マスク"], index: 1 }
+    ];
+
+    for (const r of rules) {
+      if (r.words.some(w => text.includes(w))) return r.index;
+    }
+    return 2; // その他
+  }
+
+  /* カテゴリ管理モーダル */
+  function openCategoryManager() {
+    categoryList.innerHTML = "";
+
+    data.categories.forEach((cat, ci) => {
+      const card = document.createElement("div");
+      card.className = "cat-card";
+
+      card.innerHTML = `
+        <span>${cat.icon} ${cat.name}</span>
+        ${ci >= 3 ? `<button class="cat-del" onclick="deleteCategory(${ci})">削除</button>` : ""}
+      `;
+
+      categoryList.appendChild(card);
+    });
+
+    categoryModalBg.style.display = "flex";
+  }
+
+  function closeCategoryManager() {
+    categoryModalBg.style.display = "none";
+  }
+
+  function deleteCategory(ci) {
+    if (!confirm("このカテゴリを削除しますか？\n中のアイテムもすべて削除されます。")) return;
+
+    data.categories.splice(ci, 1);
+    save();
+    openCategoryManager();
+    render();
+  }
+
+  function addCategory() {
+    const name = prompt("カテゴリ名を入力してください");
+    if (!name) return;
+
+    const icon = prompt("アイコン（絵文字）を入力してください\n例：🛍️ 🐶 🧹");
+
+    data.categories.push({
+      name,
+      icon: icon || "📁",
+      items: []
+    });
+
+    save();
+    openCategoryManager();
+    render();
+  }
+
+  /* 表示 */
+  function render() {
+    categoriesDiv.innerHTML = "";
+
+    data.categories.forEach((cat, ci) => {
+      if (cat.items.length === 0) return;
+
+      const catDiv = document.createElement("div");
+      catDiv.innerHTML = `<div class="category-title">${cat.icon} ${cat.name}</div>`;
+
+      cat.items.forEach((item, ii) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "item";
+        if (item.checked) itemDiv.classList.add("checked");
+
+        itemDiv.draggable = true;
+        itemDiv.dataset.ci = ci;
+        itemDiv.dataset.ii = ii;
+
+        itemDiv.innerHTML = `
+          <div class="item-left">
+            <input type="checkbox" ${item.checked ? "checked" : ""} onchange="toggleCheck(${ci},${ii})">
+            <span>${item.text}</span>
+          </div>
+          <button class="delete" onclick="deleteItem(${ci},${ii})">×</button>
+        `;
+
+        addDragEvents(itemDiv);
+        catDiv.appendChild(itemDiv);
+      });
+
+      categoriesDiv.appendChild(catDiv);
+    });
+  }
+
+  /* チェック */
+  function toggleCheck(ci, ii) {
+    data.categories[ci].items[ii].checked =
+      !data.categories[ci].items[ii].checked;
+    save();
+    render();
+  }
+
+  /* 削除 */
+  function deleteItem(ci, ii) {
+    data.categories[ci].items.splice(ii, 1);
+    save();
+    render();
+  }
+
+  /* チェック済み削除 */
+  function clearChecked() {
+    data.categories.forEach(cat => {
+      cat.items = cat.items.filter(i => !i.checked);
+    });
+    save();
+    render();
+  }
+
+  /* 全削除 */
+  function clearAll() {
+    data.categories.forEach(cat => cat.items = []);
+    save();
+    render();
+  }
+
+  /* 並べ替え */
+  let dragItem = null;
+
+  function addDragEvents(el) {
+    el.addEventListener("dragstart", () => {
+      dragItem = el;
+      el.style.opacity = "0.5";
+    });
+
+    el.addEventListener("dragend", () => {
+      el.style.opacity = "1";
+      dragItem = null;
+    });
+
+    el.addEventListener("dragover", e => e.preventDefault());
+
+    el.addEventListener("drop", () => {
+      if (!dragItem || dragItem === el) return;
+
+      const ci = +el.dataset.ci;
+      const ii = +el.dataset.ii;
+      const dci = +dragItem.dataset.ci;
+      const dii = +dragItem.dataset.ii;
+
+      const item = data.categories[dci].items.splice(dii, 1)[0];
+      data.categories[ci].items.splice(ii, 0, item);
+
+      save();
+      render();
+    });
+  }
+
+  render();
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+</script>
+</body>
+</html>
