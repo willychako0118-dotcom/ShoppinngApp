@@ -40,6 +40,18 @@
   flex-shrink: 0; /* ← タイトルが広がりすぎないようにする */
 }
 
+footer {
+  display: flex;
+  flex-wrap: wrap; /* ← これが超重要 */
+  gap: 10px;
+  padding: 10px;
+}
+
+footer button {
+  flex: 1; /* 幅を自動調整してくれる */
+  min-width: 120px; /* 好きに調整してOK */
+}
+
 /* ヘッダー全体のレイアウトを安定させる */
 header {
   display: flex;
