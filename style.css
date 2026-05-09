@@ -53,9 +53,7 @@ footer {
 }
 
 footer button {
-  flex: 1;
-  min-width: 0; /* ← これがないと絶対縮まらない */
-  white-space: normal; /* ← これで改行OKになる */
+  width: 48%;
 }
 
 footer button {
