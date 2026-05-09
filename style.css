@@ -52,6 +52,11 @@ footer button {
   min-width: 120px; /* 好きに調整してOK */
 }
 
+footer button {
+  min-width: 0;
+  flex: 1;
+}
+
 /* ヘッダー全体のレイアウトを安定させる */
 header {
   display: flex;
@@ -66,7 +71,6 @@ header {
   width: calc(100% - 24px); /* ← 内側余白分を引く */
   box-sizing: border-box;   /* ← 幅計算を安定させる */
 }
-
 
 /* スマホ対応 */
 @media (max-width: 600px) {
